@@ -20,7 +20,6 @@ import ErrorView from "../components/ErrorView";
 import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SearchBar from "../components/SearchBar";
-import { T_user } from "@/types/users-types";
 import UserCard from "../components/UserCard";
 import UserCardSkeleton from "../components/UserCardSkeleton";
 import UserListEmpty from "../components/UserListEmpty";
@@ -28,7 +27,7 @@ import UserListHeader from "../components/UserListHeader";
 import colors from "../styles/colors";
 
 export default function UserListScreen() {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
 
   const {
     filteredUsers,
@@ -39,7 +38,7 @@ export default function UserListScreen() {
     error,
     hasMore,
     fromCache,
-  } = useSelector((state: RootState) => state.users);
+  } = useSelector((state) => state.users);
 
   // fetch users
   useEffect(() => {
@@ -48,7 +47,7 @@ export default function UserListScreen() {
 
   // optimized cached search change event handler
   const handleSearchChange = useCallback(
-    (text: string) => {
+    (text) => {
       dispatch(setQuery(text));
     },
     [dispatch],
@@ -67,13 +66,10 @@ export default function UserListScreen() {
   }, [dispatch]);
 
   // optimized render item
-  const renderItem = useCallback(
-    ({ item }: { item: T_user }) => <UserCard user={item} />,
-    [],
-  );
+  const renderItem = useCallback(({ item }) => <UserCard user={item} />, []);
 
   // optimized key extractor
-  const keyExtractor = useCallback((item: T_user) => item.id.toString(), []);
+  const keyExtractor = useCallback((item) => item.id.toString(), []);
 
   // skeleton loading for users cards
   if (loading) {

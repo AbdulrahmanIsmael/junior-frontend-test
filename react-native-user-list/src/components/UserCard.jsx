@@ -2,15 +2,9 @@ import { StyleSheet, Text, View } from "react-native";
 import { radius, shadow, spacing, typography } from "../styles/globalStyles";
 
 import { Feather } from "@expo/vector-icons";
-import React from "react";
-import { T_user } from "@/types/users-types";
 import colors from "../styles/colors";
 
-interface UserCardProps {
-  user?: Partial<T_user>;
-}
-
-export default function UserCard({ user = {} }: UserCardProps) {
+export default function UserCard({ user = {} }) {
   const { name = "", username = "", email = "", address } = user;
 
   const initial = name.trim().charAt(0).toUpperCase() || "?";
@@ -48,12 +42,7 @@ export default function UserCard({ user = {} }: UserCardProps) {
   );
 }
 
-interface InfoRowProps {
-  icon: keyof typeof Feather.glyphMap;
-  label: string;
-}
-
-function InfoRow({ icon, label }: InfoRowProps) {
+function InfoRow({ icon, label }) {
   if (!label) return null;
   return (
     <View style={styles.infoRow}>

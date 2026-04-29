@@ -1,31 +1,22 @@
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  createAsyncThunk,
-  createSlice,
-  type PayloadAction,
-} from "@reduxjs/toolkit";
-import { T_user } from "@/types/users-types";
 
 const CACHE_KEY = "users_cache";
 // cache time to update the users every 10 minutes
 const CACHE_TIME = 10 * 60 * 1000;
 
-function calcPageSize(total: number): number {
+function calcPageSize(total) {
   if (total <= 0) return 4;
   return Math.min(10, Math.max(3, Math.round(total * 0.4)));
 }
 
-interface CacheEntry {
-  data: T_user[];
-  savedAt: number;
-}
-
 // get cached users
-async function readCache(): Promise<T_user[] | null> {
+async function readCache() {
   try {
     const raw = await AsyncStorage.getItem(CACHE_KEY);
     if (!raw) return null;
-    const entry: CacheEntry = JSON.parse(raw);
+    const entry = JSON.parse(raw);
     const age = Date.now() - entry.savedAt;
     if (age > CACHE_TIME) return null;
     return entry.data;
@@ -35,43 +26,30 @@ async function readCache(): Promise<T_user[] | null> {
 }
 
 // write users to the storage
-async function writeCache(data: T_user[]): Promise<void> {
+async function writeCache(data) {
   try {
-    const entry: CacheEntry = { data, savedAt: Date.now() };
+    const entry = { data, savedAt: Date.now() };
     await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(entry));
   } catch (error) {
     console.log(error);
   }
 }
 
-export interface I_userState {
-  allUsers: T_user[];
-  filteredUsers: T_user[];
-  query: string;
-  currentPage: number;
-  pageSize: number;
-  hasMore: boolean;
-  loading: boolean;
-  loadingMore: boolean;
-  error: boolean;
-  fromCache: boolean;
-}
-
-const initialState: I_userState = {
+const initialState = {
   allUsers: [],
   filteredUsers: [],
   query: "",
   currentPage: 1,
   pageSize: 4,
   hasMore: false,
-  loading: false,
+  loading: true,
   loadingMore: false,
   error: false,
   fromCache: false,
 };
 
 // filter users by query name
-function filterUsers(users: T_user[], query: string): T_user[] {
+function filterUsers(users, query) {
   if (!query.trim()) return users;
   const q = query.toLowerCase();
   return users.filter(
@@ -82,36 +60,38 @@ function filterUsers(users: T_user[], query: string): T_user[] {
 }
 
 // create pages for fetched users
-function paginate(filtered: T_user[], page: number, size: number): T_user[] {
+function paginate(filtered, page, size) {
   return filtered.slice(0, page * size);
 }
 
 // Async thunk to fetch users + cache the results
-export const getUsers = createAsyncThunk<
-  { data: T_user[]; fromCache: boolean },
-  void
->("users/getUsers", async (_, { rejectWithValue }) => {
-  try {
-    const response = await fetch("https://jsonplaceholder.typicode.com/users");
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data: T_user[] = await response.json();
-    await writeCache(data);
-    return { data, fromCache: false };
-  } catch {
-    const cached = await readCache();
-    if (cached && cached.length > 0) {
-      return { data: cached, fromCache: true };
+export const getUsers = createAsyncThunk(
+  "users/getUsers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/users",
+      );
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      await writeCache(data);
+      return { data, fromCache: false };
+    } catch {
+      const cached = await readCache();
+      if (cached && cached.length > 0) {
+        return { data: cached, fromCache: true };
+      }
+      return rejectWithValue("no_data");
     }
-    return rejectWithValue("no_data");
-  }
-});
+  },
+);
 
 // Async thunk to handle load more users
 export const loadMoreUsers = createAsyncThunk(
   "users/loadMore",
   async (_, { getState }) => {
-    await new Promise<void>((resolve) => setTimeout(resolve, 600));
-    const { currentPage } = (getState() as { users: I_userState }).users;
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    const { currentPage } = getState().users;
     return currentPage + 1;
   },
 );
@@ -120,7 +100,7 @@ export const usersSlice = createSlice({
   name: "users",
   initialState,
   reducers: {
-    setQuery(state, action: PayloadAction<string>) {
+    setQuery(state, action) {
       state.query = action.payload;
       state.currentPage = 1;
       const filtered = filterUsers(state.allUsers, action.payload);

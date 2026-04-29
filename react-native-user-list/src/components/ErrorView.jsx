@@ -1,14 +1,11 @@
-import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Feather } from "@expo/vector-icons";
 import { radius, shadow, spacing, typography } from "../styles/globalStyles";
+
+import { Feather } from "@expo/vector-icons";
+import React from "react";
 import colors from "../styles/colors";
 
-interface ErrorViewProps {
-  onRetry?: () => void;
-}
-
-export default function ErrorView({ onRetry }: ErrorViewProps) {
+export default function ErrorView({ onRetry }) {
   return (
     <View style={styles.container}>
       {/* Icon ring */}

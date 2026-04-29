@@ -1,19 +1,10 @@
-import React, { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
+import React, { useEffect, useRef } from "react";
 import { radius, shadow, spacing } from "../styles/globalStyles";
+
 import colors from "../styles/colors";
 
-// ─── Single shimmer block ─────────────────────────────────────────────────────
-
-function ShimmerBlock({
-  width,
-  height,
-  style,
-}: {
-  width: number | `${number}%`;
-  height: number;
-  style?: object;
-}) {
+function ShimmerBlock({ width, height, style }) {
   const opacity = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
@@ -36,7 +27,12 @@ function ShimmerBlock({
   return (
     <Animated.View
       style={[
-        { width, height, borderRadius: radius.sm, backgroundColor: colors.surfaceSubtle },
+        {
+          width,
+          height,
+          borderRadius: radius.sm,
+          backgroundColor: colors.surfaceSubtle,
+        },
         { opacity },
         style,
       ]}

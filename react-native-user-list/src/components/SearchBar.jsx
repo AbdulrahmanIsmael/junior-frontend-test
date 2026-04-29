@@ -6,15 +6,7 @@ import React from "react";
 import colors from "../styles/colors";
 import { useState } from "react";
 
-interface SearchBarProps {
-  value?: string;
-  onChangeText?: (text: string) => void;
-}
-
-export default function SearchBar({
-  value = "",
-  onChangeText = () => {},
-}: SearchBarProps) {
+export default function SearchBar({ value = "", onChangeText = () => {} }) {
   const [isFocused, setIsFocused] = useState(false);
   return (
     <View

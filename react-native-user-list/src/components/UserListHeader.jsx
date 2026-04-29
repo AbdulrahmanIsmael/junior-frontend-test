@@ -3,11 +3,7 @@ import { spacing, typography } from "../styles/globalStyles";
 
 import colors from "../styles/colors";
 
-interface UserListHeaderProps {
-  userCount?: number;
-}
-
-export default function UserListHeader({ userCount = 0 }: UserListHeaderProps) {
+export default function UserListHeader({ userCount = 0 }) {
   return (
     <View style={styles.header}>
       <View>
